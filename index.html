@@ -2,16 +2,23 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Personal Chess Engine</title>
-</head>
-<body>
-  <h1>My Personal Chess Engine</h1>
-  <script src="board.js"></script>
-  <script src="moves.js"></script>
-  <script src="evaluation.js"></script>
-  <script src="search.js"></script>
-  <style src="styles.css"></style>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Personal Chess Engine</title>
+  </head>
+  <body>
+    <h1>My Personal Chess Engine</h1>
+    <canvas id="board" width="480" height="480"></canvas>
+    
+    <h2>Move List</h2>
+    <ol id="moveList"></ol>
+
+    <script src="board.js"></script>
+    <script src="moves.js"></script>
+    <script src="evaluation.js"></script>
+    <script src="search.js"></script>
+    
+    <style src="styles.css"></style>
+    <script src="ui.js"></script>
+  </body>
 </html>

@@ -163,8 +163,35 @@ function generateQueenMoves(board, x, y) {
 
 
 
+// Alle mogelijke zetten voor koning.
+// Engine kijkt hij of er een lege plek is waar de koning naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
+// De koning kan in alle richtingen bewegen, maar slechts één vakje tegelijk.
+function generateKingMoves(board, x, y) {
+  let moves = [];
+  let piece = board[y][x];
 
+  const offsets = [
+    [1,0],[-1,0],[0,1],[0,-1],
+    [1,1],[1,-1],[-1,1],[-1,-1]
+  ];
 
+  for (let [dx, dy] of offsets) {
+    let nx = x + dx;
+    let ny = y + dy;
+
+    if (!inBounds(nx, ny)) continue;
+
+    let target = board[ny][nx];
+
+    if (target === "." ||
+       (isWhite(piece) && isBlack(target)) ||
+       (isBlack(piece) && isWhite(target))) {
+      moves.push(createMove(x, y, nx, ny, target));
+    }
+  }
+
+  return moves;
+}
 
 
 
@@ -198,6 +225,9 @@ function generateAllMoves(board, side) {
         case "q":
           moves.push(...generateQueenMoves(board, x, y));
           break;
+        case "k":
+          moves.push(...generateKingMoves(board, x, y));
+          break;
       }
     }
   }
@@ -220,3 +250,25 @@ function describeMove(board, move) { // Deze functie neemt een move object en be
   let capture = move.captured !== "." ? "x" : "-";
   return `${piece}: ${from}${capture}${to}`;
 }
+
+
+
+// Deze functies passen een zet toe op het bord en maken deze ongedaan.
+// Ze zijn essentieel voor de minimax functie, omdat we de zetten moeten kunnen toepassen en terugdraaien terwijl we de boom doorlopen.
+function applyMove(board, move) {
+  let piece = board[move.from.y][move.from.x];
+  board[move.to.y][move.to.x] = piece;
+  board[move.from.y][move.from.x] = ".";
+}
+
+function undoMove(board, move) {
+  let piece = board[move.to.y][move.to.x];
+  board[move.from.y][move.from.x] = piece;
+  board[move.to.y][move.to.x] = move.captured;
+}
+
+
+
+// Console log om moves te checken
+// let moves = generateAllMoves(board, "white");
+// moves.forEach(m => console.log(describeMove(board, m)));
