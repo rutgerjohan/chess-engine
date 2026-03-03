@@ -1,32 +1,41 @@
 // minMax is een functie die de score van een positie berekent door alle mogelijke zetten te doorlopen
 // en de score van de resulterende posities te evalueren.
-function minimax(board, depth, maximizingPlayer) {
+function minimax(board, depth, color) {
+
   if (depth === 0) {
-    return evaluate(board);
+    return evaluateBoard(board);
   }
 
-  let side = maximizingPlayer ? "white" : "black";
-  let moves = generateAllMoves(board, side);
+  let moves = generateAllMoves(board, color);
 
-  if (maximizingPlayer) {
+  if (moves.length === 0) {
+    return evaluateBoard(board);
+  }
+
+  if (color === "white") {
+
     let maxEval = -Infinity;
 
     for (let move of moves) {
-      applyMove(board, move);
-      let evalScore = minimax(board, depth - 1, false);
-      undoMove(board, move);
-      maxEval = Math.max(maxEval, evalScore);
+      let newBoard = copyBoard(board);
+      applyMove(newBoard, move);
+
+      let score = minimax(newBoard, depth - 1, "black");
+      maxEval = Math.max(maxEval, score);
     }
 
     return maxEval;
+
   } else {
+
     let minEval = Infinity;
 
     for (let move of moves) {
-      applyMove(board, move);
-      let evalScore = minimax(board, depth - 1, true);
-      undoMove(board, move);
-      minEval = Math.min(minEval, evalScore);
+      let newBoard = copyBoard(board);
+      applyMove(newBoard, move);
+
+      let score = minimax(newBoard, depth - 1, "white");
+      minEval = Math.min(minEval, score);
     }
 
     return minEval;
@@ -34,23 +43,31 @@ function minimax(board, depth, maximizingPlayer) {
 }
 
 
-
-// Deze functie doorloopt alle mogelijke zetten voor de witte stukken en gebruikt minimax om de score van elke zet te berekenen.
-// De zet met de hoogste score wordt teruggegeven als de beste zet.
-function getBestMove(board, depth) {
+// getBestMove is een functie die de beste zet vindt door alle mogelijke zetten te doorlopen en
+// de score van de resulterende posities te evalueren met behulp van minimax.
+function getBestMove(board, depth, color) {
   let bestMove = null;
-  let bestScore = -Infinity;
+  let bestValue = color === "white" ? -Infinity : Infinity;
 
-  let moves = generateAllMoves(board, "white");
+  let moves = generateAllMoves(board, color);
 
   for (let move of moves) {
-    applyMove(board, move);
-    let score = minimax(board, depth - 1, false);
-    undoMove(board, move);
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestMove = move;
+    let newBoard = copyBoard(board);
+    applyMove(newBoard, move);
+
+    let value = minimax(newBoard, depth - 1, color === "white" ? "black" : "white");
+
+    if (color === "white") {
+      if (value > bestValue) {
+        bestValue = value;
+        bestMove = move;
+      }
+    } else {
+      if (value < bestValue) {
+        bestValue = value;
+        bestMove = move;
+      }
     }
   }
 

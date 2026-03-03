@@ -259,6 +259,15 @@ function applyMove(board, move) {
   let piece = board[move.from.y][move.from.x];
   board[move.to.y][move.to.x] = piece;
   board[move.from.y][move.from.x] = ".";
+
+  // Pawn promotion
+  if (piece === "P" && move.to.y === 0) {
+  board[move.to.y][move.to.x] = "Q";
+  }
+
+  if (piece === "p" && move.to.y === 7) {
+  board[move.to.y][move.to.x] = "q";
+  }
 }
 
 function undoMove(board, move) {
