@@ -16,53 +16,53 @@ function createMove(fromX, fromY, toX, toY, captured) {
 
 
 
-// Alle mogelijke zetten voor een witte pion.
-// De functie kijkt eerst of er een pion op de gegeven positie staat.
-// Daarna kijkt hij of er een lege plek is waar de pion naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
+// PAWNS
 function generatePawnMoves(board, x, y) {
   let moves = []; // Hier maak je een lege array aan waarin de mogelijke zetten worden opgeslagen.
   let piece = board[y][x]; // Je definieerd welke piece door de y en x values door te geven.
 
   if (piece !== "P") return moves; // Als er geen witte pion (P) op de gegeven positie staat, return dan een lege array, oftewel er zijn geen mogelijke zetten.
 
-  if (inBounds(x, y - 1) && board[y - 1][x] === ".") { // Als de positie recht voor de pion binnen het bord ligt en leeg is, voeg deze zet dan toe aan de moves array. Dit is belangrijk omdat pionnen alleen recht vooruit kunnen bewegen en niet vooruit kunnen slaan.
+  // Beweegt vooruit, kan niet vooruit slaan en kan vanaf de startpositie twee vakken vooruit bewegen.
+  if (inBounds(x, y - 1) && board[y - 1][x] === ".") {
     moves.push(createMove(x, y, x, y - 1, "."));
-    if (y === 6 && board[y - 2][x] === ".") { // Als de pion nog op zijn startpositie staat (y === 6) en de positie twee vakken vooruit ook leeg is, voeg dan deze zet toe aan de moves array. Dit is belangrijk omdat pionnen vanaf hun startpositie twee vakken vooruit kunnen bewegen.
+    if (y === 6 && board[y - 2][x] === ".") {
       moves.push(createMove(x, y, x, y - 2, "."));
     }
   }
 
-  for (let dx of [-1, 1]) { // Deze loop controleert de diagonale posities links en rechts van de pion. dx is een variabele die eerst -1 is (links) en daarna 1 (rechts).
-    let nx = x + dx; // variabel nx = nieuwe x-positie (links of rechts)
-    let ny = y - 1; // variabel ny = nieuwe y-positie (vooruit)
-    if (inBounds(nx, ny) && isBlack(board[ny][nx])) { // Als de diagonale positie binnen het bord ligt en er een zwart stuk staat, voeg dan deze zet toe aan de moves array. Dit is belangrijk omdat pionnen diagonaal kunnen slaan.
+  // Diagonaal slaan
+  for (let dx of [-1, 1]) {
+    let nx = x + dx;
+    let ny = y - 1;
+    if (inBounds(nx, ny) && isBlack(board[ny][nx])) {
       moves.push(createMove(x, y, nx, ny, board[ny][nx]));
     }
   }
 
-  return moves; // Return de array met mogelijke zetten voor de pion op de gegeven positie.
+  return moves;
 }
 
 
-
-// Alle mogelijke zetten voor een paard.
-// Engine kijkt hij of er een lege plek is waar het paard naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
+// KNIGHT
 function generateKnightMoves(board, x, y) {
   let moves = [];
   let piece = board[y][x];
 
+  // Variabel die de L-vorm van het paard beschrijft
   const offsets = [
     [1,2],[2,1],[2,-1],[1,-2],
     [-1,-2],[-2,-1],[-2,1],[-1,2]
-  ]; // Variabel die de L-vorm van het paard beschrijft
+  ];
 
-  for (let [dx, dy] of offsets) { // Deze loop controleert alle mogelijke L-vormen die net gedefinieerd zijn.
+  // Deze loop controleert alle mogelijke L-vormen die net gedefinieerd zijn.
+  for (let [dx, dy] of offsets) {
     let nx = x + dx;
     let ny = y + dy;
 
-    if (!inBounds(nx, ny)) continue; // Als de nieuwe positie buiten het bord ligt, sla deze iteratie dan over.
+    if (!inBounds(nx, ny)) continue;
 
-    let target = board[ny][nx]; // Variabel target = of een stuk van zwart of een leeg vakje.
+    let target = board[ny][nx];
     if (target === "." ||
        (isWhite(piece) && isBlack(target)) ||
        (isBlack(piece) && isWhite(target))) {
@@ -70,20 +70,18 @@ function generateKnightMoves(board, x, y) {
     }
   }
 
-  return moves; // Return de array met mogelijke zetten voor de pion op de gegeven positie.
+  return moves;
 }
 
 
-
-// Alle mogelijke zetten voor een loper.
-// Engine kijkt hij of er een lege plek is waar de loper naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
+// BISHOP
 function generateBishopMoves(board, x, y) {
   let moves = [];
   let piece = board[y][x];
 
   const directions = [
     [1,1],[1,-1],[-1,1],[-1,-1]
-  ]; // Variabel die de diagonale richtingen beschrijft waarin de loper kan bewegen.
+  ];
 
   for (let [dx, dy] of directions) {
     let nx = x + dx;
@@ -92,9 +90,10 @@ function generateBishopMoves(board, x, y) {
     while (inBounds(nx, ny)) {
       let target = board[ny][nx];
 
+      // Als er een stuk op de nieuwe positie staat, controleer dan of het een stuk van de tegenstander is dat geslagen kan worden.
       if (target === ".") {
         moves.push(createMove(x, y, nx, ny, "."));
-      } else { // Als er een stuk op de nieuwe positie staat, controleer dan of het een stuk van de tegenstander is dat geslagen kan worden.
+      } else {
         if ((isWhite(piece) && isBlack(target)) ||
             (isBlack(piece) && isWhite(target))) {
           moves.push(createMove(x, y, nx, ny, target));
@@ -103,7 +102,7 @@ function generateBishopMoves(board, x, y) {
       }
 
       nx += dx;
-      ny += dy; // Blijf in dezelfde richtingen bewegen totdat je een stuk tegenkomt of buiten het bord gaat.
+      ny += dy;
     }
   }
 
@@ -111,16 +110,14 @@ function generateBishopMoves(board, x, y) {
 }
 
 
-
-// Alle mogelijke zetten voor toren.
-// Engine kijkt hij of er een lege plek is waar de toren naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
+// ROOK
 function generateRookMoves(board, x, y) {
   let moves = [];
   let piece = board[y][x];
 
   const directions = [
     [1,0],[-1,0],[0,1],[0,-1]
-  ]; // Variabel die de horizontale en verticale richtingen beschrijft waarin de toren kan bewegen.
+  ];
 
   for (let [dx, dy] of directions) {
     let nx = x + dx;
@@ -142,18 +139,13 @@ function generateRookMoves(board, x, y) {
       nx += dx;
       ny += dy;
     }
-    // Wederom zelfde functie om te checken of er een stuk in de weg staat en of het een stuk van de tegenstander is dat geslagen kan worden.
-    // Blijf in dezelfde richtingen bewegen totdat je een stuk tegenkomt of buiten het bord gaat.
   }
 
   return moves;
 }
 
 
-
-// Alle mogelijke zetten voor dame.
-// Engine kijkt hij of er een lege plek is waar de dame naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
-// De dame beweegt als een toren en een loper tegelijk, dus we kunnen de functies van de toren en loper hergebruiken.
+// QUEEN
 function generateQueenMoves(board, x, y) {
   return [
     ...generateRookMoves(board, x, y),
@@ -162,10 +154,7 @@ function generateQueenMoves(board, x, y) {
 }
 
 
-
-// Alle mogelijke zetten voor koning.
-// Engine kijkt hij of er een lege plek is waar de koning naartoe kan en of er stukken van de tegenstander zijn die kunnen worden geslagen.
-// De koning kan in alle richtingen bewegen, maar slechts één vakje tegelijk.
+// KING
 function generateKingMoves(board, x, y) {
   let moves = [];
   let piece = board[y][x];
@@ -197,12 +186,12 @@ function generateKingMoves(board, x, y) {
 
 
 
-// Deze functie genereert alle mogelijke zetten voor de gegeven kleur (side) op het bord.
+// Deze functie genereert alle mogelijke zetten voor zowel wit als zwart
 function generateAllMoves(board, side) {
   let moves = [];
 
-  for (let y = 0; y < 8; y++) { // Loop door alle rijen van het bord.
-    for (let x = 0; x < 8; x++) { // Loop door alle kolommen van het bord.
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
       let piece = board[y][x];
       if (piece === ".") continue; // Geen stukken = sla over
 
@@ -231,17 +220,19 @@ function generateAllMoves(board, side) {
       }
     }
   }
-
   return moves;
 }
 
 
 
-// Functie als helper om zetten leesbaar te maken.
+
+
+// Functies als helpers om zetten leesbaar te maken.
 function squareName(x, y) {
-  const files = "abcdefgh"; // Definieerd kolommen a t/m h
-  return files[x] + (8 - y); // De rijen worden van 8 naar 1 genummerd, dus we moeten 8 - y doen om de juiste rij te krijgen.
+  const files = "abcdefgh";
+  return files[x] + (8 - y);
 }
+
 
 function describeMove(board, move) { // Deze functie neemt een move object en beschrijft deze in een leesbaar formaat, bijvoorbeeld "N: g1-f3" voor een paard dat van g1 naar f3 beweegt.
   let piece = board[move.from.y][move.from.x];
@@ -252,9 +243,8 @@ function describeMove(board, move) { // Deze functie neemt een move object en be
 }
 
 
-
-// Deze functies passen een zet toe op het bord en maken deze ongedaan.
-// Ze zijn essentieel voor de minimax functie, omdat we de zetten moeten kunnen toepassen en terugdraaien terwijl we de boom doorlopen.
+// Funtie applyMove past een zet toe op het bord. Het verplaatst het stuk van de beginpositie naar de eindpositie en vervangt de beginpositie door een leeg vakje.
+// Als er een pion wordt gepromoveerd, wordt deze vervangen door een dame.
 function applyMove(board, move) {
   let piece = board[move.from.y][move.from.x];
   board[move.to.y][move.to.x] = piece;
@@ -269,6 +259,7 @@ function applyMove(board, move) {
   board[move.to.y][move.to.x] = "q";
   }
 }
+
 
 function undoMove(board, move) {
   let piece = board[move.to.y][move.to.x];

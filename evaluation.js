@@ -61,10 +61,6 @@ function evaluateBoard(board) {
       // Encourage knight + bishop development
       if (piece === "N" && y < 7) score += 15;
       if (piece === "n" && y > 0) score -= 15;
-
-      // Slight penalty for early rook move
-      if (piece === "R" && y === 7 && (x === 0 || x === 7)) score -= 10;
-      if (piece === "r" && y === 0 && (x === 0 || x === 7)) score += 10;
     }
   }
 

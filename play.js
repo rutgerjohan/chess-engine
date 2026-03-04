@@ -22,7 +22,7 @@ function playGame(maxMoves = 100, depth = 2) {
       console.log("No move found.");
       break;
     }
-
+    
     let movedPiece = board[bestMove.from.y][bestMove.from.x];
 
     console.log(

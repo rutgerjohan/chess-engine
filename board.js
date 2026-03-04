@@ -28,6 +28,7 @@ function inBounds(x, y) {
   return x >= 0 && x < 8 && y >= 0 && y < 8;
 }
 
+// Deze functie maakt een diepe kopie van het bord, zodat we nieuwe borden kunnen maken zonder het originele bord te wijzigen.
 function copyBoard(board) {
   return board.map(row => [...row]);
 }
